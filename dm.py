@@ -28,10 +28,9 @@ def featureSel(cls, w_list, cls_w, all_w):
     text = cur.fetchall()
     cur.close()
     conn.close()
-
     #text = text[:10]
     print (len(text))
-    cls_words = []
+    cls_words = {}
     all_words = []
     word_cls = []
     for te in text:
@@ -46,7 +45,7 @@ def featureSel(cls, w_list, cls_w, all_w):
                 if w[1] == 'noun' and w[0] not in stop_words:
                     words.append(w[0])
                     if w[0] not in cls_words:
-                        cls_words.append(w[0])
+                        cls_words[w[0]] = 0
                     if w[0] not in res:
                         res[w[0]] = 0
                     res[w[0]] += 1
@@ -88,7 +87,7 @@ def dm():
     print (N)
     corpus = []
     cls_corpus = []
-    fea = []
+    fea = {}
     res_all = []
     for i in range(len(class_all)):
         res = {}
@@ -149,11 +148,12 @@ def dm():
             z2 = (z1 * z1 * N * 1.0) /((a+c)*(a+b)*(b+d)*(c+d))
             res[w] = z2
         
-        for re in sorted(res.items(), key=lambda x:x[1], reverse=True)[:500]:
+        for re in sorted(res.items(), key=lambda x:x[1], reverse=True)[:100]:
             if re[0] not in fea:
-                fea.append(re[0])
+                fea[re[0]] = 0
         print (class_all[i]+' col done!')
-    print (len(fea))
+    print (fea)
+    '''
     for i in range(len(class_all)):
         for val in word_all[i]:
             #print (len(val))
@@ -177,17 +177,19 @@ def dm():
     #print (len(word_all))
     #print (sorted(word_num[0][5].items(), key=lambda x: x[1], reverse=True))
     #print (word_all, '\n', word_num)
+    '''
 
 if __name__ == '__main__':
-    
+    dm()
+    '''
     corpus, cls = dm()
     print (len(corpus), len(cls))
-    '''
+    
     conn = pymysql.connect(host='localhost', user='root', passwd='zxcvbnm123', port=3306, db='dm', charset='utf8')
     #print (type(corpus[0]))
     for k in range(len(cls)):
         cur = conn.cursor()
-        sql = "insert into tfidf values ('"+cls[k]+"','"+corpus[k]+"',"+str(k)+")"
+        sql = "insert into tfidf_2 values ('"+cls[k]+"','"+corpus[k]+"',"+str(k)+")"
         #print (sql)
         try:
             cur.execute(sql)
@@ -197,7 +199,7 @@ if __name__ == '__main__':
         cur.close()
     conn.commit()
     conn.close()
-    '''
+    
 
     
     vectorizer=CountVectorizer()#该类会将文本中的词语转换为词频矩阵，矩阵元素a[i][j] 表示j词在i类文本下的词频  
@@ -232,7 +234,7 @@ if __name__ == '__main__':
     from svmutil import *
     m = svm_train(y[::2], x[::2])
     p_label, p_acc, p_val = svm_predict(y[1::2], x[1::2], m)  
-    
+    '''    
 
 
 
